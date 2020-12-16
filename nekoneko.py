@@ -43,39 +43,45 @@ class HeroicNotifier:
 
 class Neko:
     def nyan(self):
-        print("nyaan")
+        return "nyaan"
 
     def meow(self):
-        print("meow")
+        return "meow"
 
     def default_response(self):
-        print ("wagahai am neko")
+        return "wagahai am neko"
 
 
 class NekoObserver:
+    def __init__(self, buf=[None]):
+        self.buf = buf
+
     def listen(self, nakigoe):
         if (nakigoe == "meow"):
             print("this nekosama meows!")
+            print(self.buf)
         else:
             print("this nekosama is from Japan")
+            print(self.buf)
 
 # Usage
 if __name__ == "__main__":
     print("\n! Ordinal neko:\n")
     neko = Neko()
-    neko.nyan()
-    neko.meow()
+    print(neko.nyan())
+    print(neko.meow())
     # neko.neee()           # <-- AttributeError: 'Neko' object has no attribute 'neee'
     # neko.nyan("nekoneko") # <-- TypeError: nyan() takes 1 positional argument but 2 were given
 
     print("\n! noko dignosis:\n")
-    nekodignosis = NekoObserver()
+    retval = [None]
+    nekodignosis = NekoObserver(retval)
     heroic_neko = HeroicNotifier(neko)
     heroic_neko.attatch(nekodignosis.listen)
-    heroic_neko.nyan()
-    heroic_neko.meow()
+    retval[0] = heroic_neko.nyan()
+    retval[0] = heroic_neko.meow()
 
     print("\n! neko dont have neee voice:\n")
-    heroic_neko.neee()
+    retval[0] = heroic_neko.neee()
 
     # heroic_neko.nyan("nyaaaan") # <-- TypeError: nyan() takes 2 positional argument but 2 were given
