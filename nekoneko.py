@@ -17,6 +17,7 @@ class HeroicNotifier:
     def __default_action(self, *args):
         print ('no such attribute')
 
+    @contextlib.contextmanager
     def __wrapper(self, *args):
         if hasattr(self.notifier, self.attr_name):
             self.callable_attr = getattr(self.notifier, self.attr_name)
@@ -27,17 +28,13 @@ class HeroicNotifier:
             # same as:
             # getattr(self, "__default_action")
 
-        retval = None
-
         for callback in self.callbacks:
             callback(self.attr_name)
 
-        retval = self.callable_attr(*args)
+        yield self.callable_attr(*args)
 
         for callback in self.callbacks:
             callback(self.attr_name)
-
-        return retval
 
         
 
@@ -78,10 +75,13 @@ if __name__ == "__main__":
     nekodignosis = NekoObserver(retval)
     heroic_neko = HeroicNotifier(neko)
     heroic_neko.attatch(nekodignosis.listen)
-    retval[0] = heroic_neko.nyan()
-    retval[0] = heroic_neko.meow()
+    with heroic_neko.nyan() as whatnekosays:
+        retval[0] = whatnekosays
+    with heroic_neko.meow() as whatnekosays:
+        retval[0] = whatnekosays
 
     print("\n! neko dont have neee voice:\n")
-    retval[0] = heroic_neko.neee()
+    with heroic_neko.neee() as whatnekosays:
+        retval[0] = whatnekosays
 
     # heroic_neko.nyan("nyaaaan") # <-- TypeError: nyan() takes 2 positional argument but 2 were given
