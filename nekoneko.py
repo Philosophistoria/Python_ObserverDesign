@@ -11,9 +11,15 @@ class HeroicNotifier:
             self.callbacks.append(callback)
 
     def __getattr__(self, name):
-        self.callable_attr = None
-        if hasattr(self.notifier, name):
-            self.callable_attr = getattr(self.notifier, name)
+        self.attr_name = name 
+        return self.__wrapper
+
+    def __default_action(self, *args):
+        print ('no such attribute')
+
+    def __wrapper(self, *args):
+        if hasattr(self.notifier, self.attr_name):
+            self.callable_attr = getattr(self.notifier, self.attr_name)
         elif hasattr(self.notifier, "default_response"):
             self.callable_attr = getattr(self.notifier, "default_response")
         else:
@@ -21,21 +27,15 @@ class HeroicNotifier:
             # same as:
             # getattr(self, "__default_action")
 
-        return self.__wrapper
-
-    def __default_action(self, *args):
-        print ('no such attribute')
-
-    def __wrapper(self, *args):
         retval = None
 
         for callback in self.callbacks:
-            callback(self.callable_attr)
+            callback(self.attr_name)
 
-        retval = self.callable_attr()
+        retval = self.callable_attr(*args)
 
         for callback in self.callbacks:
-            callback(self.callable_attr)
+            callback(self.attr_name)
 
         return retval
 
