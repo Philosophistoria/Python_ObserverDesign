@@ -1,3 +1,5 @@
+import contextlib
+
 class HeroicNotifier:
     def __init__(self, notifier, callback=None):
         self.callbacks = [] 
@@ -9,20 +11,35 @@ class HeroicNotifier:
             self.callbacks.append(callback)
 
     def __getattr__(self, name):
-        for callback in self.callbacks:
-            callback(name)
+        self.callable_attr = None
         if hasattr(self.notifier, name):
-            return getattr(self.notifier, name)
+            self.callable_attr = getattr(self.notifier, name)
         elif hasattr(self.notifier, "default_response"):
-            return getattr(self.notifier, "default_response")
+            self.callable_attr = getattr(self.notifier, "default_response")
         else:
-            return self.__default_action
+            self.callable_attr = self.__default_action
             # same as:
-            # return getattr(self, "__default_action")
+            # getattr(self, "__default_action")
+
+        return self.__wrapper
 
     def __default_action(self, *args):
         print ('no such attribute')
 
+    def __wrapper(self, *args):
+        retval = None
+
+        for callback in self.callbacks:
+            callback(self.callable_attr)
+
+        retval = self.callable_attr()
+
+        for callback in self.callbacks:
+            callback(self.callable_attr)
+
+        return retval
+
+        
 
 class Neko:
     def nyan(self):
@@ -60,4 +77,5 @@ if __name__ == "__main__":
 
     print("\n! neko dont have neee voice:\n")
     heroic_neko.neee()
+
     # heroic_neko.nyan("nyaaaan") # <-- TypeError: nyan() takes 2 positional argument but 2 were given
