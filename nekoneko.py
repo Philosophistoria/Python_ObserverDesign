@@ -11,23 +11,29 @@ class HeroicNotifier:
             self.callbacks.append(callback)
 
     def __getattr__(self, name):
+        # Set attr_name
         self.attr_name = name 
+
+        tmp = self.__default_action
+        if hasattr(self.notifier, self.attr_name):
+            tmp = getattr(self.notifier, self.attr_name)
+        elif hasattr(self.notifier, "default_response"):
+            tmp = getattr(self.notifier, "default_response") 
+
+        if callable(tmp):
+            self.callable_attr = tmp
+        # if the attribute required was not callback just return the ref.
+        else:
+            return tmp
+
         return self.__wrapper
 
     def __default_action(self, *args):
         print ('no such attribute')
+        raise AttributeError
 
     @contextlib.contextmanager
     def __wrapper(self, *args):
-        if hasattr(self.notifier, self.attr_name):
-            self.callable_attr = getattr(self.notifier, self.attr_name)
-        elif hasattr(self.notifier, "default_response"):
-            self.callable_attr = getattr(self.notifier, "default_response")
-        else:
-            self.callable_attr = self.__default_action
-            # same as:
-            # getattr(self, "__default_action")
-
         for callback in self.callbacks:
             callback(self.attr_name)
 
@@ -39,6 +45,8 @@ class HeroicNotifier:
         
 
 class Neko:
+    def __init__(self):
+        self.voice = "he is john"
     def nyan(self):
         return "nyaan"
 
@@ -79,6 +87,7 @@ if __name__ == "__main__":
         retval[0] = whatnekosays
     with heroic_neko.meow() as whatnekosays:
         retval[0] = whatnekosays
+    print(heroic_neko.voice)
 
     print("\n! neko dont have neee voice:\n")
     with heroic_neko.neee() as whatnekosays:
