@@ -1,5 +1,3 @@
-# The symbolic link of observable.py is in Test dir
-import observable
 
 class Neko:
     def __init__(self):
@@ -28,6 +26,11 @@ class NekoObserver:
 
 # Usage
 if __name__ == "__main__":
+    import os   #nopep
+    import sys  #nopep
+    sys.path.append('../')
+    import observable #nopep
+
     print("\n! Ordinal neko:\n")
     neko = Neko()
     print(neko.nyan())
@@ -35,21 +38,50 @@ if __name__ == "__main__":
     # neko.neee()           # <-- AttributeError: 'Neko' object has no attribute 'neee'
     # neko.nyan("nekoneko") # <-- TypeError: nyan() takes 1 positional argument but 2 were given
 
+    print("\n --- ! w/ with statement --- ")
     print("\n! noko dignosis:\n")
     retval = [None]
     nekodignosis = NekoObserver(retval)
-    heroic_neko = observable.ObservableNotifier(neko)
+    heroic_neko = observable.ObservableNotifier(neko,'contextmanager')
     heroic_neko.attatch(nekodignosis.listen)
+
     with heroic_neko.nyan() as whatnekosays:
         retval[0] = whatnekosays
+    print()
+
     with heroic_neko.meow() as whatnekosays:
         retval[0] = whatnekosays
+    print()
+
     print(heroic_neko.voice)
     with heroic_neko.voice as whatnekosays:
         retval[0] = whatnekosays
+    print()
 
     print("\n! neko dont have neee voice:\n")
     with heroic_neko.neee() as whatnekosays:
         retval[0] = whatnekosays
+    print()
 
     # heroic_neko.nyan("nyaaaan") # <-- TypeError: nyan() takes 2 positional argument but 2 were given
+    
+    print("\n --- ! w/o with statement --- ")
+    print("\n! noko dignosis:\n")
+    retval = [None]
+    nekodignosis = NekoObserver(retval)
+    heroic_neko = observable.ObservableNotifier(neko,'functionref')
+    heroic_neko.attatch(nekodignosis.listen)
+
+    retval[0] = heroic_neko.nyan()
+    print()
+
+    retval[0] = heroic_neko.meow()
+    print()
+
+    print(heroic_neko.voice)
+    retval[0] = heroic_neko.voice
+    print()
+
+    print("\n! neko dont have neee voice:\n")
+    retval[0] = heroic_neko.neee()
+    print()
