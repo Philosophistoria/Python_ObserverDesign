@@ -14,19 +14,16 @@ class HeroicNotifier:
         # Set attr_name
         self.attr_name = name 
 
-        tmp = self.__default_action
+        self.attr = self.__default_action
         if hasattr(self.notifier, self.attr_name):
-            tmp = getattr(self.notifier, self.attr_name)
+            self.attr = getattr(self.notifier, self.attr_name)
         elif hasattr(self.notifier, "default_response"):
-            tmp = getattr(self.notifier, "default_response") 
+            self.attr = getattr(self.notifier, "default_response") 
 
-        if callable(tmp):
-            self.callable_attr = tmp
-        # if the attribute required was not callback just return the ref.
+        if callable(self.attr):
+            return self.__wrapper
         else:
-            return tmp
-
-        return self.__wrapper
+            return self.__wrapper_uncallable
 
     def __default_action(self, *args):
         print ('no such attribute')
@@ -37,11 +34,21 @@ class HeroicNotifier:
         for callback in self.callbacks:
             callback(self.attr_name)
 
-        yield self.callable_attr(*args)
+            yield self.attr(*args)
 
         for callback in self.callbacks:
             callback(self.attr_name)
+    
+    @property
+    @contextlib.contextmanager
+    def __wrapper_uncallable(self):
+        for callback in self.callbacks:
+            callback(self.attr_name)
 
+            yield self.attr
+
+        for callback in self.callbacks:
+            callback(self.attr_name)
         
 
 class Neko:
@@ -88,6 +95,8 @@ if __name__ == "__main__":
     with heroic_neko.meow() as whatnekosays:
         retval[0] = whatnekosays
     print(heroic_neko.voice)
+    with heroic_neko.voice as whatnekosays:
+        retval[0] = whatnekosays
 
     print("\n! neko dont have neee voice:\n")
     with heroic_neko.neee() as whatnekosays:
