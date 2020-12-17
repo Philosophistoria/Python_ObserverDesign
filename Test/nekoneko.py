@@ -25,11 +25,16 @@ class NekoObserver:
             print(self.buf)
 
 # Usage
+'''
+pyobservable/../$ python3 -m Test.nekoneko
+'''
+
 if __name__ == "__main__":
     import os   #nopep
     import sys  #nopep
     sys.path.append('../')
-    import observable #nopep
+    from pyobservable import observable #nopep
+    from pyobservable import observer #nopep
 
     print("\n! Ordinal neko:\n")
     neko = Neko()
@@ -43,7 +48,7 @@ if __name__ == "__main__":
     retval = [None]
     nekodignosis = NekoObserver(retval)
     heroic_neko = observable.ObservableNotifier(neko,'contextmanager')
-    heroic_neko.attatch(nekodignosis.listen)
+    heroic_neko.attatch(observer.receive_notification_by(nekodignosis.listen,funcreqarg=True))
 
     with heroic_neko.nyan() as whatnekosays:
         retval[0] = whatnekosays
@@ -70,7 +75,7 @@ if __name__ == "__main__":
     retval = [None]
     nekodignosis = NekoObserver(retval)
     heroic_neko = observable.ObservableNotifier(neko,'functionref')
-    heroic_neko.attatch(nekodignosis.listen)
+    heroic_neko.attatch(observer.receive_notification_by(nekodignosis.listen,timing_res='post',attr_res='meow',funcreqarg=True))
 
     retval[0] = heroic_neko.nyan()
     print()
