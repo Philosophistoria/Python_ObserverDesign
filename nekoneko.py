@@ -32,23 +32,23 @@ class HeroicNotifier:
     @contextlib.contextmanager
     def __wrapper(self, *args):
         for callback in self.callbacks:
-            callback(self.attr_name)
+            callback(self.attr_name, "pre")
 
             yield self.attr(*args)
 
         for callback in self.callbacks:
-            callback(self.attr_name)
+            callback(self.attr_name, "post")
     
     @property
     @contextlib.contextmanager
     def __wrapper_uncallable(self):
         for callback in self.callbacks:
-            callback(self.attr_name)
+            callback(self.attr_name, "pre")
 
             yield self.attr
 
         for callback in self.callbacks:
-            callback(self.attr_name)
+            callback(self.attr_name, "post")
         
 
 class Neko:
@@ -68,12 +68,12 @@ class NekoObserver:
     def __init__(self, buf=[None]):
         self.buf = buf
 
-    def listen(self, nakigoe):
-        if (nakigoe == "meow"):
-            print("this nekosama meows!")
+    def listen(self, *args):
+        if (args[0] == "meow"):
+            print("this nekosama meows!", args)
             print(self.buf)
         else:
-            print("this nekosama is from Japan")
+            print("this nekosama is from Japan", args)
             print(self.buf)
 
 # Usage
