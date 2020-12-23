@@ -59,8 +59,8 @@ if __name__ == "__main__":
     print()
 
     print(heroic_neko.voice)
-    with heroic_neko.voice as whatnekosays:
-        retval[0] = whatnekosays
+    # with heroic_neko.voice as whatnekosays:
+    #     retval[0] = whatnekosays
     print()
 
     print("\n! neko dont have neee voice:\n")

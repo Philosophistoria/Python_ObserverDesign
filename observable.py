@@ -26,62 +26,47 @@ class ObservableNotifier:
             self.callbacks.append(callback)
 
     def __getattr__(self, name):
-        # Set attr_name
-        self.attr_name = name 
-
         # Set the reference to the entity of the attr
-        self.attr = self.__default_action
-        if hasattr(self.notifier, self.attr_name):
-            self.attr = getattr(self.notifier, self.attr_name)
+        attr = self.__default_action
+        if hasattr(self.notifier, name):
+            attr = getattr(self.notifier, name)
         elif hasattr(self.notifier, "default_response"):
-            self.attr = getattr(self.notifier, "default_response") 
+            attr = getattr(self.notifier, "default_response") 
 
-        if self.rettype == 'contextmanager':
             # return a wrapper which yield generator of iterator of attr executing callbacks before/after the yielding
-            if callable(self.attr):
-                return self.__wrapper_cm
+        if callable(attr):
+            if self.rettype == 'contextmanager':
+                @contextlib.contextmanager
+                def __wrapper_cm(*args):
+                    for callback in self.callbacks:
+                        callback(None, name, "pre")
+
+                    retval = attr(*args)
+                    yield retval
+
+                    for callback in self.callbacks:
+                        callback(retval, name, "post")
+                return __wrapper_cm
+            # if the attr is not callable, yield the attr ref
             else:
-                return self.__wrapper_cm_uncallable
+                def __wrapper(*args):
+                    for callback in self.callbacks:
+                        callback(None, name, "pre")
+
+                    retval = attr(*args)
+
+                    for callback in self.callbacks:
+                        callback(retval, name, "post")
+
+                    return retval
+                return __wrapper
         else:
-            if callable(self.attr):
-                return self.__wrapper
-            else:
-                return self.attr
+            return attr
 
 
     def __default_action(self, *args):
         print ('no such attribute')
         raise AttributeError
 
-    def __wrapper(self, *args):
-        for callback in self.callbacks:
-            callback(None, self.attr_name, "pre")
 
-        retval = self.attr(*args)
-
-        for callback in self.callbacks:
-            callback(retval, self.attr_name, "post")
-
-        return retval
-
-    @contextlib.contextmanager
-    def __wrapper_cm(self, *args):
-        for callback in self.callbacks:
-            callback(None, self.attr_name, "pre")
-
-        retval = self.attr(*args)
-        yield retval
-
-        for callback in self.callbacks:
-            callback(retval, self.attr_name, "post")
     
-    @property
-    @contextlib.contextmanager
-    def __wrapper_cm_uncallable(self):
-        for callback in self.callbacks:
-            callback(None, self.attr_name, "pre")
-
-        yield self.attr
-
-        for callback in self.callbacks:
-            callback(self.attr, self.attr_name, "post")
