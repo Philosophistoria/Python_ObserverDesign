@@ -55,32 +55,33 @@ class ObservableNotifier:
 
     def __wrapper(self, *args):
         for callback in self.callbacks:
-            callback(self.attr_name, "pre")
+            callback(None, self.attr_name, "pre")
 
-        tmp = self.attr(*args)
+        retval = self.attr(*args)
 
         for callback in self.callbacks:
-            callback(self.attr_name, "post")
+            callback(retval, self.attr_name, "post")
 
-        return tmp
+        return retval
 
     @contextlib.contextmanager
     def __wrapper_cm(self, *args):
         for callback in self.callbacks:
-            callback(self.attr_name, "pre")
+            callback(None, self.attr_name, "pre")
 
-        yield self.attr(*args)
+        retval = self.attr(*args)
+        yield retval
 
         for callback in self.callbacks:
-            callback(self.attr_name, "post")
+            callback(retval, self.attr_name, "post")
     
     @property
     @contextlib.contextmanager
     def __wrapper_cm_uncallable(self):
         for callback in self.callbacks:
-            callback(self.attr_name, "pre")
+            callback(None, self.attr_name, "pre")
 
         yield self.attr
 
         for callback in self.callbacks:
-            callback(self.attr_name, "post")
+            callback(self.attr, self.attr_name, "post")
