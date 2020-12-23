@@ -75,7 +75,7 @@ if __name__ == "__main__":
     retval = [None]
     nekodignosis = NekoObserver(retval)
     heroic_neko = observable.ObservableNotifier(neko,'functionref')
-    heroic_neko.attatch(observer.receive_notification_by(nekodignosis.listen,timing_res='post',attr_res='meow',funcreqarg=True))
+    heroic_neko.attatch(observer.receive_notification_by(nekodignosis.listen,timing_res='post',attr_res='all',funcreqarg=True))
 
     retval[0] = heroic_neko.nyan()
     print()
